@@ -16,7 +16,7 @@ source sdk/bin/activate
 pip3 install ask-sdk
 ```
 
-## ¿Cómo incluier ASK?
+## ¿Cómo incluir ASK?
 
 
 *lambda_function.py*
@@ -61,7 +61,7 @@ echo "Done!"
 
 ## Despliegue
 
-Para desplegar nuevo código puedes colocar todo en un zip  y subirlo a S3 o usal la CLI de AWS, o usar el script `deploy.sh`
+Para desplegar nuevo código puedes colocar todo en un zip y subirlo a S3 o usar la CLI de AWS, o corer el script `deploy.sh`
 
 
 ```
@@ -80,7 +80,7 @@ echo "Done!
 
 # Implementando la skill
 
-En el archivo `lambda_function.py` encontrarás la lógica de la función para el reloj mundial, el cual maneja los intents de la skill Reloj Mundial:
+En el archivo `lambda_function.py` encontrarás la lógica de la función para el reloj mundial, el cual maneja los intents de la skill *Reloj Mundial*:
 
 
 * `getTime`:  Da la hora local (UTC) 

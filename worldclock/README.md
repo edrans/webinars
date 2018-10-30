@@ -79,11 +79,11 @@ echo "Done!
 
 # Implementing the skill 
 
-In the `lambda_function.py` file you will find the logic for a world time function, which handles the WorldTime skill's intents: 
+In the `lambda_function.py` file you will find the logic for a world clock function, which handles the *World Clock* skill's intents: 
 
-* `getTime`:  Get the UTC time 
-* `getCityTime` Get the local time in a provided  city
+* `getTime`:  Get the local time (UTC)
+* `getCityTime` Get the local time in a given city
 
 # Model file
 
-The `es_MX.json` file has the utterances in Spanish for the intents.  You can load this file in the developer console. 
+The `es_MX.json` file has the utterances in Spanish for the intents.  You can load this file in the developer console.
