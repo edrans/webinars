@@ -1,6 +1,6 @@
 # La skill Reloj Mundial 
 
-Esta skill es un ejemplo de uso de Python y el SD de Alexa (ASK). Esta implementa dos intents (acciones):
+Esta skill es un ejemplo de uso de Python y el SDK de Alexa (ASK). Esta implementa dos intents (acciones):
 
 1. Dime la hora 
 1. Dime la hora en tal ciudad
