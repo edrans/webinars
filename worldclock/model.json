@@ -1,0 +1,51 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "reloj mundial",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "GetTimeIntent",
+                    "slots": [],
+                    "samples": [
+                        "me puedes decir la hora",
+                        "quiero saber la hora",
+                        "que hora es ",
+                        "dime la hora"
+                    ]
+                },
+                {
+                    "name": "GetCityTimeIntent",
+                    "slots": [
+                        {
+                            "name": "city",
+                            "type": "AMAZON.City"
+                        }
+                    ],
+                    "samples": [
+                        "quiero saber la hora en {city}",
+                        "me puedes decir la hora en {city}",
+                        "dime la hora en {city}",
+                        "qué hora es en {city}"
+                    ]
+                }
+            ],
+            "types": []
+        }
+    }
+}

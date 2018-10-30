@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": "${workspaceFolder}/sdk/bin/python",
+    "git.ignoreLimitWarning": true
+}
