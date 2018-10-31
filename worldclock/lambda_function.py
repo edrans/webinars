@@ -16,6 +16,11 @@ from ask_sdk_model.ui import SimpleCard
 
 # Timezone
 import pytz
+from timezonefinder import TimezoneFinder
+from geopy.geocoders import Nominatim
+
+# Boto3
+import boto3
 
 # Logging 
 import datetime
@@ -74,13 +79,27 @@ class GetCityTimeIntentHandler(AbstractRequestHandler):
 
         if city_slot in slots:
             city = slots[city_slot].value
-            city_trim = city.replace(" ","_")
 
-            matching = [s for s in pytz.all_timezones if city_trim.lower() in s.lower()][0]
-            city_timezone = pytz.timezone(matching)
-            city_time = datetime.datetime.now(city_timezone).strftime('%I:%M %p')
+            # Translate city to English
+            translate = boto3.client(service_name='translate', region_name='us-east-1', use_ssl=True)
+            city_en = translate.translate_text(Text=city, SourceLanguageCode="es", TargetLanguageCode="en")["TranslatedText"]
 
-            speech_text = "<speak>En {} son <say-as interpret-as='time'>{}</say-as></speak>".format(city, city_time)
+            city_trim = city_en.replace(" ","_")
+
+            geolocator = Nominatim(user_agent='worldclock skill')
+            location = geolocator.geocode(city_en)
+            tf = TimezoneFinder()
+
+            city_timezone = pytz.timezone(tf.timezone_at(lng=location.longitude, lat=location.latitude))
+
+            (city_time, ampm) = datetime.datetime.now(city_timezone).strftime('%I:%M %p').split(" ")
+
+            if ampm == "AM":
+                ampm = "A.M."
+            else:
+                ampm = "P.M."
+
+            speech_text = "<speak>En {} son <say-as interpret-as='time'>{} {}</say-as></speak>".format(city, city_time, ampm)
 
             print(speech_text)
 
