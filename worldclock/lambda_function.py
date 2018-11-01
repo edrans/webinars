@@ -16,11 +16,11 @@ from ask_sdk_model.ui import SimpleCard
 
 # Timezone
 import pytz
+from pytz import country_timezones
 from timezonefinder import TimezoneFinder
 from geopy.geocoders import Nominatim
-
-# Boto3
-import boto3
+import pycountry
+import gettext
 
 # Logging 
 import datetime
@@ -59,11 +59,15 @@ class GetTimeIntentHandler(AbstractRequestHandler):
         return is_intent_name("GetTimeIntent")(handler_input)
 
     def handle(self, handler_input):
-        local_time = datetime.datetime.now().strftime('%I:%M %p')
 
-        speech_text = "<speak>Son <say-as interpret-as='time'>{}</say-as></speak>".format(local_time)
+        (local_time, ampm) = datetime.datetime.now().strftime('%I:%M %p').split(" ")
 
-        print(speech_text)
+        if ampm == "AM":
+            ampm = "A.M."
+        else:
+            ampm = "P.M."
+
+        speech_text = "<speak>Son <say-as interpret-as='time'>{} {}</say-as></speak>".format(local_time, ampm)
 
         handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text)).set_should_end_session(False)
         return handler_input.response_builder.response
@@ -78,32 +82,42 @@ class GetCityTimeIntentHandler(AbstractRequestHandler):
         slots = handler_input.request_envelope.request.intent.slots
 
         if city_slot in slots:
-            city = slots[city_slot].value
 
-            # Translate city to English
-            translate = boto3.client(service_name='translate', region_name='us-east-1', use_ssl=True)
-            city_en = translate.translate_text(Text=city, SourceLanguageCode="es", TargetLanguageCode="en")["TranslatedText"]
-
-            city_trim = city_en.replace(" ","_")
+            city_name = slots[city_slot].value
 
             geolocator = Nominatim(user_agent='worldclock skill')
-            location = geolocator.geocode(city_en)
+            location = geolocator.geocode(city_name)
             tf = TimezoneFinder()
+            timezone_str = tf.timezone_at(lng=location.longitude, lat=location.latitude)
+            timezone = pytz.timezone(timezone_str)
 
-            city_timezone = pytz.timezone(tf.timezone_at(lng=location.longitude, lat=location.latitude))
+            # Get country
+            timezone_countries = {timezone: country for country, timezones in country_timezones.items() for timezone in timezones}
+            country_code = timezone_countries[timezone_str]
+            country = pycountry.countries.get(alpha_2=country_code)
 
-            (city_time, ampm) = datetime.datetime.now(city_timezone).strftime('%I:%M %p').split(" ")
+            country_translation = gettext.translation('iso3166', pycountry.LOCALES_DIR, languages=['es'])
+            country_translation.install()
+            country_name = _(country.name)
+            country_name = country_name.split(",")[0]
+
+
+            (city_time, ampm) = datetime.datetime.now(timezone).strftime('%I:%M %p').split(" ")
 
             if ampm == "AM":
                 ampm = "A.M."
             else:
                 ampm = "P.M."
 
-            speech_text = "<speak>En {} son <say-as interpret-as='time'>{} {}</say-as></speak>".format(city, city_time, ampm)
+            if " de " + country_name.lower() not in city_name.lower():
+                city_name = "".join(city_name.lower().rsplit(country_name.lower()))
 
-            print(speech_text)
+            if not city_name:
+                speech_text = "<speak>En {}, son <say-as interpret-as='time'>{} {}</say-as></speak>".format(country_name, city_time, ampm)
+            else:
+                speech_text = "<speak>En {}, {}, son <say-as interpret-as='time'>{} {}</say-as></speak>".format(city_name, country_name, city_time, ampm)
 
-        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text)).set_should_end_session(False)
+        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text)).set_should_end_session(True)
         return handler_input.response_builder.response
 
 
