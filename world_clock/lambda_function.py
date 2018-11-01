@@ -117,7 +117,7 @@ class GetCityTimeIntentHandler(AbstractRequestHandler):
             else:
                 speech_text = "<speak>En {}, {}, son <say-as interpret-as='time'>{} {}</say-as></speak>".format(city_name, country_name, city_time, ampm)
 
-        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text)).set_should_end_session(True)
+        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text)).set_should_end_session(False)
         return handler_input.response_builder.response
 
 
@@ -127,6 +127,8 @@ class HelpIntentHandler(AbstractRequestHandler):
         return is_intent_name("AMAZON.HelpIntent")(handler_input)
 
     def handle(self, handler_input):
+
+        help_text = "Puedes preguntar la hora, por ejemplo, diciendo: 'dime la hora en Buenos Aires'"
         speech_text = help_text
 
         handler_input.response_builder.speak(speech_text).ask(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text))
