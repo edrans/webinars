@@ -68,8 +68,9 @@ class GetTimeIntentHandler(AbstractRequestHandler):
             ampm = "P.M."
 
         speech_text = "<speak>Son <say-as interpret-as='time'>{} {}</say-as></speak>".format(local_time, ampm)
+        video_text = "Son {} {}".format(local_time, ampm)
 
-        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text)).set_should_end_session(False)
+        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", video_text)).set_should_end_session(False)
         return handler_input.response_builder.response
 
 # GetCityTime Intent handler
@@ -114,10 +115,12 @@ class GetCityTimeIntentHandler(AbstractRequestHandler):
 
             if not city_name:
                 speech_text = "<speak>En {}, son <say-as interpret-as='time'>{} {}</say-as></speak>".format(country_name, city_time, ampm)
+                video_text = "En {}, son {} {}".format(country_name, city_time, ampm)
             else:
                 speech_text = "<speak>En {}, {}, son <say-as interpret-as='time'>{} {}</say-as></speak>".format(city_name, country_name, city_time, ampm)
+                video_text = "En {}, {}, son {} {}".format(city_name, country_name, city_time, ampm)
 
-        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text)).set_should_end_session(False)
+        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", video_text)).set_should_end_session(False)
         return handler_input.response_builder.response
 
 
