@@ -14,7 +14,7 @@ from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.utils import is_request_type, is_intent_name
 from ask_sdk_model.ui import SimpleCard
 
-# Timezone
+# Timezone, Timezone finder, geolocation, country_code, country_name
 import pytz
 from pytz import country_timezones
 from timezonefinder import TimezoneFinder
@@ -60,6 +60,10 @@ class GetTimeIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
 
+        # %I = Hour (12-hour clock) as a zero-padded decimal number.
+        # %M = Minute as a zero-padded decimal number.
+        # %p = Locale’s equivalent of either AM or PM.
+
         (local_time, ampm) = datetime.datetime.now().strftime('%I:%M %p').split(" ")
 
         if ampm == "AM":
@@ -68,8 +72,9 @@ class GetTimeIntentHandler(AbstractRequestHandler):
             ampm = "P.M."
 
         speech_text = "<speak>Son <say-as interpret-as='time'>{} {}</say-as></speak>".format(local_time, ampm)
+        video_text = "Son {} {}".format(local_time, ampm)
 
-        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text)).set_should_end_session(False)
+        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", video_text)).set_should_end_session(False)
         return handler_input.response_builder.response
 
 # GetCityTime Intent handler
@@ -85,6 +90,7 @@ class GetCityTimeIntentHandler(AbstractRequestHandler):
 
             city_name = slots[city_slot].value
 
+            # Get Timezone
             geolocator = Nominatim(user_agent='worldclock skill')
             location = geolocator.geocode(city_name)
             tf = TimezoneFinder()
@@ -96,11 +102,15 @@ class GetCityTimeIntentHandler(AbstractRequestHandler):
             country_code = timezone_countries[timezone_str]
             country = pycountry.countries.get(alpha_2=country_code)
 
+            # Get conutry name in Spanish
             country_translation = gettext.translation('iso3166', pycountry.LOCALES_DIR, languages=['es'])
             country_translation.install()
             country_name = _(country.name)
             country_name = country_name.split(",")[0]
 
+            # %I = Hour (12-hour clock) as a zero-padded decimal number.
+            # %M = Minute as a zero-padded decimal number.
+            # %p = Locale’s equivalent of either AM or PM.
 
             (city_time, ampm) = datetime.datetime.now(timezone).strftime('%I:%M %p').split(" ")
 
@@ -109,15 +119,18 @@ class GetCityTimeIntentHandler(AbstractRequestHandler):
             else:
                 ampm = "P.M."
 
+            # Some Spanish formatting
             if " de " + country_name.lower() not in city_name.lower():
                 city_name = "".join(city_name.lower().rsplit(country_name.lower()))
 
             if not city_name:
                 speech_text = "<speak>En {}, son <say-as interpret-as='time'>{} {}</say-as></speak>".format(country_name, city_time, ampm)
+                video_text = "En {}, son {} {}".format(country_name, city_time, ampm)
             else:
                 speech_text = "<speak>En {}, {}, son <say-as interpret-as='time'>{} {}</say-as></speak>".format(city_name, country_name, city_time, ampm)
+                video_text = "En {}, {}, son {} {}".format(city_name, country_name, city_time, ampm)
 
-        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", speech_text)).set_should_end_session(False)
+        handler_input.response_builder.speak(speech_text).set_card(SimpleCard("Reloj Mundial", video_text)).set_should_end_session(False)
         return handler_input.response_builder.response
 
 
